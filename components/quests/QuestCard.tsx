@@ -2,95 +2,112 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Trash2, Loader2 } from "lucide-react";
-import { GlowCard } from "@/components/ui/GlowCard";
+import { ArrowRight, Check } from "lucide-react";
 import type { DemoQuest } from "@/components/providers/GameProvider";
 import { cn } from "@/lib/utils";
 
-const DIFF_STYLE: Record<string, string> = {
-  easy: "text-emerald-300 border-emerald-400/30 bg-emerald-400/10",
-  normal: "text-arcane-300 border-arcane-400/30 bg-arcane-500/10",
-  hard: "text-orange-300 border-orange-400/30 bg-orange-400/10",
-  epic: "text-gold-300 border-gold-400/40 bg-gold-500/10",
-};
-
-const RARITY: Record<string, "common" | "rare" | "epic" | "legendary"> = {
-  easy: "common",
-  normal: "rare",
-  hard: "epic",
-  epic: "legendary",
+const ATTR_LABEL: Record<string, string> = {
+  strength: "Strength",
+  intellect: "Intellect",
+  endurance: "Endurance",
+  wisdom: "Wisdom",
+  focus: "Focus",
 };
 
 export function QuestCard({
   quest,
+  index,
   onComplete,
   onDelete,
   pending,
 }: {
   quest: DemoQuest;
-  onComplete: () => void;
+  index: number;
+  onComplete: (source: HTMLElement) => void;
   onDelete: () => void;
   pending: boolean;
 }) {
+  const done = quest.is_completed;
   const [confirming, setConfirming] = useState(false);
   return (
-    <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      <GlowCard rarity={RARITY[quest.difficulty] ?? "common"} className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h3 className={cn("font-semibold", quest.is_completed && "text-slate-400 line-through")}>
-              {quest.title}
-            </h3>
-            {quest.description && <p className="mt-1 text-sm text-slate-400">{quest.description}</p>}
-          </div>
+    <motion.li
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      className={cn(
+        "group grid grid-cols-[2rem_1fr] gap-3 border-b hairline py-5 transition-colors sm:grid-cols-[2.5rem_1fr_auto] sm:gap-5",
+        !done && "hover:bg-white/[0.018]"
+      )}
+    >
+      <span
+        className={cn(
+          "tnum pt-1 text-sm",
+          done ? "text-moss" : "text-fog-faint"
+        )}
+        aria-hidden="true"
+      >
+        {done ? <Check className="h-4 w-4" /> : String(index + 1).padStart(2, "0")}
+      </span>
+
+      <div className="min-w-0">
+        <h3
+          className={cn(
+            "text-lg font-semibold leading-snug",
+            done ? "text-fog-faint line-through" : "text-ink"
+          )}
+        >
+          {quest.title}
+        </h3>
+        {quest.description && (
+          <p className={cn("mt-1 text-[15px] leading-relaxed", done ? "text-fog-faint" : "text-fog")}>
+            {quest.description}
+          </p>
+        )}
+        <p className="kicker mt-2.5 !text-[10px] !tracking-[0.22em] text-fog-faint">
+          {ATTR_LABEL[quest.attribute_reward] ?? quest.attribute_reward} · {quest.difficulty}
+          {done && quest.attribute_points > 0 && (
+            <span className="ml-2 text-steel-300">+{quest.attribute_points}</span>
+          )}
+        </p>
+        {!done && (
           <button
             onClick={() => {
-              if (confirming) onDelete();
-              else {
+              if (confirming) {
+                onDelete();
+              } else {
                 setConfirming(true);
-                setTimeout(() => setConfirming(false), 2500);
+                window.setTimeout(() => setConfirming(false), 2600);
               }
             }}
-            className="rounded p-2 text-slate-500 hover:bg-white/5 hover:text-blood"
-            aria-label={confirming ? `Confirm delete ${quest.title}` : `Delete ${quest.title}`}
-            title="Delete quest"
+            className="mt-2 text-xs text-fog-faint opacity-0 transition hover:text-blood focus-visible:opacity-100 group-hover:opacity-100"
+            aria-label={confirming ? `Confirm abandoning ${quest.title}` : `Abandon ${quest.title}`}
           >
-            <Trash2 className="h-4 w-4" aria-hidden="true" />
+            {confirming ? "Confirm abandon?" : "Abandon"}
           </button>
-        </div>
-        {confirming && <p className="mt-1 text-xs text-blood">Tap again to abandon this quest.</p>}
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-          <span className={cn("rounded-full border px-2.5 py-1 font-semibold uppercase tracking-wider", DIFF_STYLE[quest.difficulty])}>
-            {quest.difficulty}
+        )}
+      </div>
+
+      <div className="col-span-2 flex items-center justify-between gap-4 pl-11 sm:col-span-1 sm:flex-col sm:items-end sm:justify-center sm:pl-0">
+        <p className={cn("tnum text-sm font-semibold", done ? "text-fog-faint" : "text-ink")}>
+          +{quest.xp_reward} XP
+          <span className={cn("ml-3", done ? "text-fog-faint" : "text-gold-400")}>
+            +{quest.gold_reward} G
           </span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 uppercase tracking-wider text-slate-300">
-            {quest.category} → {quest.attribute_reward}
-          </span>
-          <span className="ml-auto font-semibold text-arcane-300">+{quest.xp_reward} XP</span>
-          <span className="font-semibold text-gold-400">+{quest.gold_reward} G</span>
-        </div>
-        <button
-          onClick={onComplete}
-          disabled={quest.is_completed || pending}
-          className={cn(
-            "mt-3 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-rune text-sm font-semibold transition active:scale-[0.98]",
-            quest.is_completed
-              ? "cursor-default bg-emerald-500/15 text-emerald-300"
-              : "bg-gradient-to-b from-gold-300 to-gold-600 text-black hover:brightness-110 shadow-gold-glow"
-          )}
-          aria-label={quest.is_completed ? `${quest.title} completed` : `Complete ${quest.title}`}
-        >
-          {pending ? (
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-          ) : quest.is_completed ? (
-            <>
-              <Check className="h-4 w-4" aria-hidden="true" /> Quest Complete
-            </>
-          ) : (
-            "Complete Quest"
-          )}
-        </button>
-      </GlowCard>
-    </motion.div>
+        </p>
+        {done ? (
+          <span className="kicker !text-[10px] text-moss">Done</span>
+        ) : (
+          <button
+            onClick={(e) => onComplete(e.currentTarget)}
+            disabled={pending}
+            aria-label={pending ? "Completing quest" : `Complete ${quest.title}`}
+            className="press inline-flex min-h-[44px] items-center gap-1.5 rounded-sharp border border-gold-500/50 px-4 text-sm font-semibold text-gold-400 transition hover:bg-gold-500 hover:text-black disabled:opacity-60"
+          >
+            {pending ? "Sealing…" : <>Complete <ArrowRight className="h-4 w-4" aria-hidden="true" /></>}
+          </button>
+        )}
+      </div>
+    </motion.li>
   );
 }

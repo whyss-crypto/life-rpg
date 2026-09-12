@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/primitives";
 
+const inputCls =
+  "w-full rounded-sharp border hairline bg-black/40 px-3.5 py-2.5 text-[15px] text-ink outline-none placeholder:text-fog-faint focus:border-gold-500/60";
+
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -33,8 +36,6 @@ export default function SignupPage() {
       }
       const user = data.user;
       if (user) {
-        // Best-effort profile creation (RLS owner policies allow this).
-        // The board self-heals a missing profile on first load anyway.
         await supabase.from("profiles").insert({
           id: user.id,
           username,
@@ -43,57 +44,52 @@ export default function SignupPage() {
         await supabase.from("characters").insert({ user_id: user.id });
       }
       if (!data.session) {
-        // Email confirmation is on: no session until the user clicks the link.
-        setInfo("Account forged! Check your email to confirm it, then sign in.");
+        setInfo("Account forged. Check your email to confirm it, then sign in.");
         return;
       }
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Signup failed. Check your connection and try again."
-      );
+      setError(err instanceof Error ? err.message : "Signup failed. Check your connection and try again.");
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4">
-      <p className="font-display text-center text-sm tracking-[0.3em] text-gold-300">BEGIN YOUR LEGEND</p>
-      <h1 className="font-display mt-2 text-center text-3xl font-bold">Create account</h1>
-      <form onSubmit={submit} className="card-surface mt-6 rounded-rune p-6">
-        <label className="mb-3 block">
-          <span className="mb-1 block text-sm">Username</span>
+    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-5">
+      <p className="kicker text-gold-400">Begin your legend</p>
+      <h1 className="font-display mt-3 text-4xl font-bold text-ink">Create account</h1>
+      <form onSubmit={submit} className="mt-8 border-t hairline pt-8">
+        <label className="block">
+          <span className="kicker mb-2 block !text-[10px] text-fog-faint">Username</span>
           <input
             value={username} onChange={(e) => setUsername(e.target.value)} required
             placeholder="dragon_slayer_01" maxLength={24} autoComplete="username"
-            className="w-full rounded-rune border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none focus:border-gold-400/60"
+            className={inputCls}
           />
         </label>
-        <label className="mb-3 block">
-          <span className="mb-1 block text-sm">Email</span>
+        <label className="mt-4 block">
+          <span className="kicker mb-2 block !text-[10px] text-fog-faint">Email</span>
           <input
             type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            className="w-full rounded-rune border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none focus:border-gold-400/60"
+            autoComplete="email" className={inputCls}
           />
         </label>
-        <label className="mb-4 block">
-          <span className="mb-1 block text-sm">Password (min 6 chars)</span>
+        <label className="mt-4 block">
+          <span className="kicker mb-2 block !text-[10px] text-fog-faint">Password · min 6</span>
           <input
             type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password"
-            className="w-full rounded-rune border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none focus:border-gold-400/60"
+            autoComplete="new-password" className={inputCls}
           />
         </label>
-        {error && <p role="alert" className="mb-3 text-sm text-blood">{error}</p>}
-        {info && <p role="status" className="mb-3 text-sm text-emerald-300">{info}</p>}
-        <Button type="submit" disabled={pending} className="w-full">
-          {pending ? "Forging character…" : "Forge Character"}
+        {error && <p role="alert" className="mt-4 text-sm text-blood">{error}</p>}
+        {info && <p role="status" className="mt-4 text-sm text-moss">{info}</p>}
+        <Button type="submit" disabled={pending} className="mt-6 w-full !min-h-[52px]">
+          {pending ? "Forging character…" : "Forge character"}
         </Button>
-        <p className="mt-4 text-center text-sm text-slate-400">
-          Have an account? <Link href="/login" className="text-gold-300 underline">Sign in</Link>
+        <p className="mt-6 text-center text-sm text-fog">
+          Have an account? <Link href="/login" className="text-ink underline decoration-white/25 underline-offset-4 hover:decoration-white/60">Sign in</Link>
         </p>
       </form>
     </main>

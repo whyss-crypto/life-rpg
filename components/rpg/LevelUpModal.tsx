@@ -1,54 +1,54 @@
 "use client";
 
-import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Crown } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/primitives";
 
+/**
+ * Level-up, restrained: a quiet veil, a long beat, the numeral turns.
+ * No confetti, no explosion. Anticipation does the work.
+ */
 export function LevelUpModal({
   open,
   oldLevel,
   newLevel,
+  detail,
   onClose,
 }: {
   open: boolean;
   oldLevel: number;
   newLevel: number;
+  detail?: string;
   onClose: () => void;
 }) {
+  const numeralRef = useRef<HTMLParagraphElement>(null);
+  const ruleRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+
   useEffect(() => {
-    if (!open) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+    if (!open || reduce) return;
     let cancelled = false;
     (async () => {
       try {
-        const confetti = (await import("canvas-confetti")).default;
-        if (cancelled) return;
-        const end = Date.now() + 900;
-        const colors = ["#f5b942", "#ffe9a8", "#6e8fff", "#5eead4"];
-        (function frame() {
-          confetti({ particleCount: 6, angle: 60, spread: 60, origin: { x: 0 }, colors });
-          confetti({ particleCount: 6, angle: 120, spread: 60, origin: { x: 1 }, colors });
-          if (Date.now() < end && !cancelled) requestAnimationFrame(frame);
-        })();
-        confetti({ particleCount: 160, spread: 100, origin: { y: 0.4 }, colors });
-      } catch {}
-      try {
         const { gsap } = await import("gsap");
-        if (!cancelled) {
-          gsap.fromTo(
-            "[data-level-banner]",
-            { scale: 0.7, opacity: 0 },
-            { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(1.6)" }
-          );
-        }
+        if (cancelled) return;
+        // Beat of quiet, then the numeral turns over.
+        gsap.fromTo(
+          numeralRef.current,
+          { opacity: 0, y: 26 },
+          { opacity: 1, y: 0, duration: 0.9, delay: 0.55, ease: "power3.out" }
+        );
+        gsap.fromTo(
+          ruleRef.current,
+          { scaleX: 0 },
+          { scaleX: 1, duration: 1.1, delay: 0.7, ease: "power3.inOut" }
+        );
       } catch {}
     })();
     return () => {
       cancelled = true;
     };
-  }, [open ]);
+  }, [open, reduce]);
 
   useEffect(() => {
     if (!open) return;
@@ -63,38 +63,33 @@ export function LevelUpModal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/80 p-6"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { duration: 0.5 } }}
+          exit={{ opacity: 0, transition: { duration: 0.3 } }}
           role="dialog"
           aria-modal="true"
           aria-label={`Level up to level ${newLevel}`}
         >
-          <motion.div
-            data-level-banner
-            initial={{ y: 24, scale: 0.95 }}
-            animate={{ y: 0, scale: 1 }}
-            className="card-surface glow-card w-full max-w-md rounded-rune border-gold-400/50 p-8 text-center shadow-gold-glow"
-          >
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-b from-gold-300 to-gold-700 shadow-gold-glow">
-              <Crown className="h-8 w-8 text-black" aria-hidden="true" />
-            </div>
-            <p className="font-display text-sm tracking-[0.3em] text-gold-300">LEVEL UP</p>
-            <p className="font-display mt-2 text-5xl font-bold">
-              <span className="text-slate-400 line-through decoration-blood/70 text-3xl">{oldLevel}</span>{" "}
-              <span className="gold-text">→ {newLevel}</span>
+          <div className="w-full max-w-md text-center">
+            <p className="kicker text-fog-faint">Level</p>
+            <p
+              ref={numeralRef}
+              className="display-num mt-4 text-8xl font-bold leading-none text-ink sm:text-9xl"
+            >
+              {newLevel}
             </p>
-            <p className="mt-3 text-sm text-slate-300">
-              Your discipline forged a stronger self. Attributes boosted. The board awaits your next quest.
+            <div ref={ruleRef} className="mx-auto mt-6 h-px w-40 bg-gold-500/70" aria-hidden="true" />
+            <p className="mt-6 text-[15px] text-fog">
+              {oldLevel} is behind you{detail ? ` — ${detail}` : ". Attributes sharpened."}
             </p>
             <div aria-live="polite" className="sr-only">
-              Level up! You are now level {newLevel}.
+              Level up. You are now level {newLevel}.
             </div>
-            <Button onClick={onClose} className="mt-6 w-full" autoFocus>
-              Continue the Journey
+            <Button variant="ghost" onClick={onClose} className="mt-8 min-w-[220px]" autoFocus>
+              Return to the board
             </Button>
-          </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

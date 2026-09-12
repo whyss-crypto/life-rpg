@@ -10,14 +10,14 @@ export default function InventoryPage() {
   const c = state.character;
   return (
     <AppShell>
-      <p className="font-display text-xs tracking-[0.3em] text-gold-300">INVENTORY VAULT</p>
-      <h1 className="font-display text-2xl font-bold sm:text-3xl">
-        Your <span className="gold-text">Relics</span>
+      <p className="kicker text-fog-faint">Inventory vault</p>
+      <h1 className="font-display mt-2 text-3xl font-bold text-ink sm:text-4xl">
+        Relics
       </h1>
-      <div className="mt-4">
-        <HUDHeader level={c.level} xp={c.xp} gold={c.gold} streak={c.current_streak} title={c.equipped_title} />
+      <div className="mt-6">
+        <HUDHeader name={state.username} level={c.level} xp={c.xp} gold={c.gold} streak={c.current_streak} title={c.equipped_title} />
       </div>
-      <div className="mt-4">
+      <div className="mt-8">
         <InventoryVault
           owned={state.inventory}
           catalog={state.catalog}

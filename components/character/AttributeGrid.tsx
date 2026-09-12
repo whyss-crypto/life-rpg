@@ -1,52 +1,46 @@
 "use client";
 
 import { Dumbbell, Brain, Activity, BookOpen, Crosshair } from "lucide-react";
-import { GlowCard } from "@/components/ui/GlowCard";
 import type { AttributeKey } from "@/lib/game/attributes";
 
-const ICONS: Record<AttributeKey, typeof Dumbbell> = {
-  strength: Dumbbell,
-  intellect: Brain,
-  endurance: Activity,
-  wisdom: BookOpen,
-  focus: Crosshair,
-};
+const ROWS: Array<{ key: AttributeKey; abbr: string; label: string; icon: typeof Dumbbell }> = [
+  { key: "strength", abbr: "STR", label: "Strength", icon: Dumbbell },
+  { key: "intellect", abbr: "INT", label: "Intellect", icon: Brain },
+  { key: "endurance", abbr: "END", label: "Endurance", icon: Activity },
+  { key: "wisdom", abbr: "WIS", label: "Wisdom", icon: BookOpen },
+  { key: "focus", abbr: "FOC", label: "Focus", icon: Crosshair },
+];
 
-const LABELS: Record<AttributeKey, string> = {
-  strength: "Strength",
-  intellect: "Intellect",
-  endurance: "Endurance",
-  wisdom: "Wisdom",
-  focus: "Focus",
-};
-
-export function AttributeGrid({
-  stats,
-}: {
-  stats: Record<AttributeKey, number>;
-}) {
+/**
+ * Attribute ledger — reads like a character sheet, not a KPI dashboard.
+ */
+export function AttributeGrid({ stats }: { stats: Record<AttributeKey, number> }) {
   const max = Math.max(10, ...Object.values(stats));
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-5" role="list" aria-label="Character attributes">
-      {(Object.keys(LABELS) as AttributeKey[]).map((key) => {
-        const Icon = ICONS[key];
+    <div role="list" aria-label="Character attributes" className="border-t hairline">
+      {ROWS.map(({ key, abbr, label, icon: Icon }) => {
         const pct = Math.min(100, Math.round((stats[key] / max) * 100));
         return (
-          <GlowCard key={key} className="p-3" role="listitem">
-            <div className="flex items-center gap-2">
-              <Icon className="h-4 w-4 text-gold-400" aria-hidden="true" />
-              <p className="text-xs font-semibold uppercase tracking-widest text-slate-300">{LABELS[key]}</p>
+          <div
+            key={key}
+            role="listitem"
+            className="grid grid-cols-[auto_1fr_auto] items-baseline gap-4 border-b hairline py-3.5"
+          >
+            <p className="flex items-center gap-2.5 text-sm text-fog">
+              <Icon className="h-4 w-4 text-fog-faint" strokeWidth={1.75} aria-hidden="true" />
+              <span className="tnum w-8 text-xs tracking-[0.18em]">{abbr}</span>
+              <span className="hidden sm:inline">{label}</span>
+            </p>
+            <div className="h-[2px] overflow-hidden rounded-full bg-white/[0.07]" aria-hidden="true">
+              <div className="h-full rounded-full bg-steel-400/80" style={{ width: `${pct}%` }} />
             </div>
-            <p className="font-display mt-1 text-2xl font-bold" aria-label={`${LABELS[key]} ${stats[key]}`}>
+            <p
+              className="display-num tnum w-10 text-right text-xl font-bold text-ink"
+              aria-label={`${label} ${stats[key]}`}
+            >
               {stats[key]}
             </p>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/60" aria-hidden="true">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-arcane-500 to-gold-400"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-          </GlowCard>
+          </div>
         );
       })}
     </div>

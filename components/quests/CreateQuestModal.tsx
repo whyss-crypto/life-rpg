@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/primitives";
 import { CATEGORIES } from "@/lib/game/attributes";
 import { rewardsFor } from "@/lib/game/economy";
 
+const inputCls =
+  "w-full rounded-sharp border hairline bg-black/40 px-3.5 py-2.5 text-[15px] text-ink outline-none placeholder:text-fog-faint focus:border-gold-500/60";
+
 export function CreateQuestModal({
   open,
   onClose,
@@ -45,7 +48,7 @@ export function CreateQuestModal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[70] flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          className="fixed inset-0 z-[70] flex items-end justify-center bg-black/80 p-0 sm:items-center sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -55,50 +58,47 @@ export function CreateQuestModal({
         >
           <motion.form
             onSubmit={submit}
-            initial={{ y: 40, opacity: 0 }}
+            initial={{ y: 32, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 40, opacity: 0 }}
-            className="card-surface w-full max-w-lg rounded-t-2xl border-white/10 p-6 sm:rounded-rune"
+            exit={{ y: 32, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full max-w-lg border-t hairline bg-void-900 p-6 sm:border sm:p-8"
           >
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-lg tracking-widest text-gold-300">NEW QUEST</h2>
-              <button onClick={onClose} type="button" className="rounded p-2 text-slate-400 hover:bg-white/5" aria-label="Close quest creator">
+            <div className="flex items-baseline justify-between">
+              <h2 className="kicker text-ink">New quest</h2>
+              <button onClick={onClose} type="button" className="press rounded p-2 text-fog hover:text-ink" aria-label="Close quest creator">
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
 
-            <label className="mb-3 block">
-              <span className="mb-1 block text-sm text-slate-300">Quest title *</span>
+            <label className="mt-6 block">
+              <span className="kicker mb-2 block !text-[10px] text-fog-faint">Title</span>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Study React for 1 hour"
+                placeholder="Study React for 1 hour"
                 maxLength={120}
-                className="w-full rounded-rune border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none placeholder:text-slate-500 focus:border-gold-400/60"
+                className={inputCls}
                 autoFocus
               />
             </label>
 
-            <label className="mb-3 block">
-              <span className="mb-1 block text-sm text-slate-300">Details</span>
+            <label className="mt-4 block">
+              <span className="kicker mb-2 block !text-[10px] text-fog-faint">Terms of done</span>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="What does 'done' look like?"
+                placeholder="What does finished look like?"
                 rows={2}
                 maxLength={500}
-                className="w-full rounded-rune border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none placeholder:text-slate-500 focus:border-gold-400/60"
+                className={inputCls}
               />
             </label>
 
-            <div className="mb-3 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-2 gap-4">
               <label className="block">
-                <span className="mb-1 block text-sm text-slate-300">Category</span>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-rune border border-white/10 bg-black/40 px-3 py-2.5 text-sm"
-                >
+                <span className="kicker mb-2 block !text-[10px] text-fog-faint">Discipline</span>
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
                   {CATEGORIES.map((c) => (
                     <option key={c.key} value={c.key}>
                       {c.label}
@@ -107,12 +107,8 @@ export function CreateQuestModal({
                 </select>
               </label>
               <label className="block">
-                <span className="mb-1 block text-sm text-slate-300">Difficulty</span>
-                <select
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value as typeof difficulty)}
-                  className="w-full rounded-rune border border-white/10 bg-black/40 px-3 py-2.5 text-sm"
-                >
+                <span className="kicker mb-2 block !text-[10px] text-fog-faint">Weight</span>
+                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as typeof difficulty)} className={inputCls}>
                   <option value="easy">Easy</option>
                   <option value="normal">Normal</option>
                   <option value="hard">Hard</option>
@@ -121,24 +117,24 @@ export function CreateQuestModal({
               </label>
             </div>
 
-            <p className="mb-4 rounded-rune border border-gold-400/20 bg-gold-500/5 px-3 py-2 text-sm" aria-live="polite">
-              Reward preview: <span className="font-semibold text-arcane-300">+{reward.xp} XP</span>{" "}
-              <span className="font-semibold text-gold-400">+{reward.gold} Gold</span>{" "}
-              <span className="text-slate-400">+{reward.attrPoints} attribute</span>
+            <p className="tnum mt-5 border-t hairline pt-4 text-sm text-fog" aria-live="polite">
+              Terms: <span className="font-semibold text-ink">+{reward.xp} XP</span>
+              <span className="ml-3 font-semibold text-gold-400">+{reward.gold} G</span>
+              <span className="ml-3 text-fog-faint">+{reward.attrPoints} attribute</span>
             </p>
 
             {error && (
-              <p role="alert" className="mb-3 text-sm text-blood">
+              <p role="alert" className="mt-3 text-sm text-blood">
                 {error}
               </p>
             )}
 
-            <div className="flex gap-2">
+            <div className="mt-5 flex gap-3">
               <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
-                Cancel
+                Decline
               </Button>
               <Button type="submit" className="flex-1">
-                Accept Quest
+                Accept quest
               </Button>
             </div>
           </motion.form>

@@ -129,6 +129,7 @@ export async function getGameState(): Promise<{ ok: true; board: BoardState } | 
     .single();
   if (charErr && isMissingTable(charErr)) return setupFail();
   let character = char0 as Record<string, unknown> | null;
+  let isNewCharacter = false;
   if (!character) {
     const { data: cins, error: cinsErr } = await supabase
       .from("characters")
@@ -137,6 +138,46 @@ export async function getGameState(): Promise<{ ok: true; board: BoardState } | 
       .single();
     if (cinsErr && isMissingTable(cinsErr)) return setupFail();
     character = (cins as Record<string, unknown> | null) ?? null;
+    isNewCharacter = true;
+  }
+
+  // First experience: a brand-new hero with a virgin board gets three
+  // starter quests so the product is immediately playable. Rewards follow
+  // the standard difficulty table (easy: 50 XP / 10 G), computed here.
+  if (isNewCharacter) {
+    const { count: questCount } = await supabase
+      .from("quests")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then((r: { count: number | null }) => ({ count: typeof r.count === "number" ? r.count : 1 }));
+    const { count: doneCount } = await supabase
+      .from("quest_completions")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then((r: { count: number | null }) => ({ count: typeof r.count === "number" ? r.count : 1 }));
+    if (questCount === 0 && doneCount === 0) {
+      const { attributeForCategory } = await import("@/lib/game/attributes");
+      const { rewardsFor } = await import("@/lib/game/economy");
+      const starters = [
+        { title: "Study for 30 minutes", description: "One subject. Phone in another room.", category: "study" },
+        { title: "Walk for 20 minutes", description: "Outside. No destination required.", category: "running" },
+        { title: "Read 10 pages", description: "Any book. Keep one line worth remembering.", category: "reading" },
+      ];
+      const r = rewardsFor("easy");
+      await supabase.from("quests").insert(
+        starters.map((s) => ({
+          user_id: user.id,
+          title: s.title,
+          description: s.description,
+          category: s.category,
+          difficulty: "easy",
+          xp_reward: r.xp,
+          gold_reward: r.gold,
+          attribute_reward: attributeForCategory(s.category),
+          attribute_points: r.attrPoints,
+        }))
+      );
+    }
   }
 
   const [qQuests, qInv, qItems, qAllAch, qMyAch, qCount] = await Promise.all([

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Coins, Loader2, Check } from "lucide-react";
-import { GlowCard } from "@/components/ui/GlowCard";
 import { cn } from "@/lib/utils";
 
 export interface ShopItem {
@@ -14,11 +12,11 @@ export interface ShopItem {
   description: string | null;
 }
 
-const RARITY_STYLE: Record<string, string> = {
-  common: "text-slate-300 border-white/15",
-  rare: "text-mana border-mana/40",
-  epic: "text-arcane-300 border-arcane-400/50",
-  legendary: "text-gold-300 border-gold-400/60",
+const RARITY_TICK: Record<string, string> = {
+  common: "bg-fog-faint",
+  rare: "bg-steel-400",
+  epic: "bg-ember",
+  legendary: "bg-gold-500",
 };
 
 export function ShopItemCard({
@@ -43,42 +41,39 @@ export function ShopItemCard({
   }
 
   return (
-    <GlowCard
-      rarity={(item.rarity as "common" | "rare" | "epic" | "legendary") ?? "common"}
-      className="flex flex-col p-4"
-    >
-      <div className="flex items-center justify-between gap-2">
-        <span className={cn("rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest", RARITY_STYLE[item.rarity] ?? RARITY_STYLE.common)}>
-          {item.rarity}
-        </span>
-        <span className="text-[11px] uppercase tracking-widest text-slate-500">{item.type}</span>
-      </div>
-      <h3 className="font-display mt-2 text-lg font-bold">{item.name}</h3>
-      <p className="mt-1 min-h-[40px] text-sm text-slate-400">{item.description ?? "A mysterious relic of the realm."}</p>
-      <div className="mt-3 flex items-center justify-between">
-        <span className="flex items-center gap-1.5 font-semibold text-gold-300">
-          <Coins className="h-4 w-4" aria-hidden="true" /> {item.price} G
-        </span>
-        {owned ? (
-          <span className="flex items-center gap-1 text-sm text-emerald-300">
-            <Check className="h-4 w-4" aria-hidden="true" /> Owned
+    <div className="grid gap-3 border-b hairline py-6 sm:grid-cols-[1fr_auto] sm:items-baseline sm:gap-8">
+      <div>
+        <p className="flex items-center gap-2.5">
+          <span className={cn("h-3.5 w-[3px]", RARITY_TICK[item.rarity] ?? RARITY_TICK.common)} aria-hidden="true" />
+          <span className="kicker !text-[10px] text-fog-faint">
+            {item.rarity} · {item.type}
           </span>
+        </p>
+        <h3 className="font-display mt-2 text-xl font-bold text-ink">{item.name}</h3>
+        <p className="mt-1 max-w-lg text-[15px] text-fog">
+          {item.description ?? "A mysterious relic of the realm."}
+        </p>
+        {error && (
+          <p role="alert" className="mt-2 text-sm text-blood">
+            {error}
+          </p>
+        )}
+      </div>
+      <div className="flex items-center gap-5 sm:flex-col sm:items-end sm:gap-2">
+        <p className="tnum text-lg font-semibold text-gold-400">{item.price} G</p>
+        {owned ? (
+          <span className="kicker !text-[10px] text-moss">In vault</span>
         ) : (
           <button
             onClick={() => void buy()}
             disabled={pending}
-            className="min-h-[40px] rounded-rune bg-gradient-to-b from-gold-300 to-gold-600 px-4 text-sm font-semibold text-black hover:brightness-110 disabled:opacity-60"
-            aria-label={`Buy ${item.name} for ${item.price} gold`}
+            className="press min-h-[44px] rounded-sharp border border-gold-500/50 px-5 text-sm font-semibold text-gold-400 transition hover:bg-gold-500 hover:text-black disabled:opacity-60"
+            aria-label={`Acquire ${item.name} for ${item.price} gold`}
           >
-            {pending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : "Acquire"}
+            {pending ? "Sealing…" : "Acquire"}
           </button>
         )}
       </div>
-      {error && (
-        <p role="alert" className="mt-2 text-xs text-blood">
-          {error}
-        </p>
-      )}
-    </GlowCard>
+    </div>
   );
 }

@@ -33,16 +33,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <LoadingBoard />
         ) : status === "error" ? (
           <div
-            className="card-surface rounded-rune mx-auto mt-10 max-w-lg p-8 text-center"
+            className="card-surface rounded-sharp mx-auto mt-10 max-w-lg p-8 text-center"
             role="alert"
           >
             <p className="font-display text-xl tracking-widest text-blood">REALM UNREACHABLE</p>
-            <p className="mt-3 text-sm text-slate-300">{error}</p>
+            <p className="mt-3 text-sm text-fog">{error}</p>
             <div className="mt-6 flex justify-center gap-2">
               <Button onClick={() => void refresh()}>Retry</Button>
               <Link
                 href="/"
-                className="inline-flex min-h-[44px] items-center rounded-rune border border-white/10 bg-white/5 px-5 text-sm hover:bg-white/10"
+                className="press inline-flex min-h-[44px] items-center rounded-sharp border hairline bg-white/[0.03] px-5 text-sm text-fog hover:text-ink"
               >
                 Home
               </Link>

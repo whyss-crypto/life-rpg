@@ -15,37 +15,44 @@ export default function ShopPage() {
 
   return (
     <AppShell>
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="font-display text-xs tracking-[0.3em] text-gold-300">ARMORY & SHOP</p>
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">
-            Spend Glory. <span className="gold-text">Become Legend.</span>
+          <p className="kicker text-fog-faint">Armory</p>
+          <h1 className="font-display mt-2 text-3xl font-bold text-ink sm:text-4xl">
+            Spend glory.
           </h1>
         </div>
-        <p className="flex items-center gap-2 rounded-rune border border-gold-400/30 bg-gold-500/10 px-4 py-2 text-sm font-semibold text-gold-300">
-          <Coins className="h-4 w-4" aria-hidden="true" /> {c.gold.toLocaleString()} Gold
+        <p className="tnum text-sm text-fog">
+          Treasury — <span className="text-xl font-semibold text-gold-400">{c.gold.toLocaleString()} G</span>
         </p>
       </div>
 
-      <div className="mt-4">
-        <HUDHeader level={c.level} xp={c.xp} gold={c.gold} streak={c.current_streak} title={c.equipped_title} />
+      <div className="mt-6">
+        <HUDHeader
+          name={state.username}
+          level={c.level}
+          xp={c.xp}
+          gold={c.gold}
+          streak={c.current_streak}
+          title={c.equipped_title}
+        />
       </div>
 
       {notice && (
-        <p role="status" className="mt-4 rounded-rune border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
+        <p role="status" className="border-b hairline py-3 text-sm text-gold-400">
           {notice}
         </p>
       )}
 
       {state.catalog.length === 0 ? (
-        <div className="mt-4">
+        <div className="mt-6">
           <EmptyState
-            title="THE ARMORY IS EMPTY."
-            body="No relics are stocked yet. Run the database seed migration (004_seed_data.sql) to fill the shelves."
+            title="Bare shelves."
+            body="No relics are stocked yet. Run the database seed migration (004_seed_data.sql) to fill the armory."
           />
         </div>
       ) : (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 border-t hairline">
           {state.catalog.map((item) => (
             <ShopItemCard
               key={item.id}
@@ -53,13 +60,18 @@ export default function ShopPage() {
               owned={state.inventory.includes(item.id)}
               onBuy={async () => {
                 const r = await purchase(item.id);
-                if (r.ok) setNotice(`${item.name} acquired! Check your Vault.`);
+                if (r.ok) setNotice(`${item.name} acquired — it waits in your vault.`);
                 return r;
               }}
             />
           ))}
         </div>
       )}
+
+      <p className="mt-6 flex items-center gap-1.5 text-sm text-fog-faint">
+        <Coins className="h-4 w-4" aria-hidden="true" />
+        Every coin is earned on the board. Nothing here costs real money.
+      </p>
     </AppShell>
   );
 }

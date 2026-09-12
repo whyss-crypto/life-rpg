@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { useGame } from "@/components/providers/GameProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/primitives";
-import { GlowCard } from "@/components/ui/GlowCard";
+
+const inputCls =
+  "min-w-0 flex-1 rounded-sharp border hairline bg-black/40 px-3.5 py-2.5 text-[15px] text-ink outline-none focus:border-gold-500/60";
 
 export default function SettingsPage() {
   const { state, setUsername } = useGame();
@@ -36,51 +38,54 @@ export default function SettingsPage() {
       setIsError(true);
       return;
     }
-    setMsg("Hero name updated across the realm.");
+    setMsg("The realm knows you by the new name.");
   }
 
   return (
     <AppShell>
-      <p className="font-display text-xs tracking-[0.3em] text-gold-300">CONFIGURATION</p>
-      <h1 className="font-display text-2xl font-bold sm:text-3xl">Settings</h1>
-      <div className="mt-4 grid gap-3">
-        <GlowCard className="p-4">
-          <h2 className="font-semibold">Hero name</h2>
-          <p className="mt-1 text-sm text-slate-400">Shown across your dashboard and character sheet.</p>
-          <form className="mt-3 flex gap-2" onSubmit={(e) => void saveName(e)}>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={24}
-              aria-label="Hero name"
-              className="min-w-0 flex-1 rounded-rune border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-gold-400/60"
-            />
-            <Button type="submit" variant="ghost" className="!min-h-[40px]" disabled={saving}>
-              {saving ? "Saving…" : "Save"}
-            </Button>
-          </form>
-          {msg && (
-            <p role={isError ? "alert" : "status"} className={`mt-2 text-sm ${isError ? "text-blood" : "text-emerald-300"}`}>
-              {msg}
-            </p>
-          )}
-        </GlowCard>
-        <GlowCard className="p-4">
-          <h2 className="font-semibold">Cloud saves</h2>
-          <p className="mt-1 text-sm text-slate-400">
-            Your hero lives in Supabase — progress persists across devices and survives refreshes.
+      <p className="kicker text-fog-faint">Configuration</p>
+      <h1 className="font-display mt-2 text-3xl font-bold text-ink sm:text-4xl">Settings</h1>
+
+      <section className="mt-8 border-t hairline pt-6" aria-label="Hero name">
+        <h2 className="text-lg font-semibold text-ink">Hero name</h2>
+        <p className="mt-1 text-[15px] text-fog">Written beside your level, everywhere.</p>
+        <form className="mt-4 flex max-w-md gap-3" onSubmit={(e) => void saveName(e)}>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={24}
+            aria-label="Hero name"
+            className={inputCls}
+          />
+          <Button type="submit" variant="ghost" disabled={saving}>
+            {saving ? "Saving…" : "Save"}
+          </Button>
+        </form>
+        {msg && (
+          <p role={isError ? "alert" : "status"} className={`mt-3 text-sm ${isError ? "text-blood" : "text-moss"}`}>
+            {msg}
           </p>
-        </GlowCard>
-        <GlowCard className="flex flex-wrap items-center justify-between gap-3 p-4">
+        )}
+      </section>
+
+      <section className="mt-8 border-t hairline pt-6" aria-label="Cloud saves">
+        <h2 className="text-lg font-semibold text-ink">Cloud saves</h2>
+        <p className="mt-1 max-w-md text-[15px] leading-relaxed text-fog">
+          Your hero lives in the database — progress follows you across devices and survives refreshes.
+        </p>
+      </section>
+
+      <section className="mt-8 border-t border-b hairline py-6" aria-label="Session">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="font-semibold">Session</h2>
-            <p className="text-sm text-slate-400">Sign out of this device.</p>
+            <h2 className="text-lg font-semibold text-ink">Session</h2>
+            <p className="mt-1 text-[15px] text-fog">Leave this device.</p>
           </div>
           <Button variant="danger" onClick={() => void logout()}>
             Log out
           </Button>
-        </GlowCard>
-      </div>
+        </div>
+      </section>
     </AppShell>
   );
 }
