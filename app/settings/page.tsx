@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import { useGame } from "@/components/providers/GameProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/primitives";
-
-const inputCls =
-  "min-w-0 flex-1 rounded-sharp border hairline bg-black/40 px-3.5 py-2.5 text-[15px] text-ink outline-none focus:border-gold-500/60";
+import { fieldCls } from "@/components/ui/field";
 
 export default function SettingsPage() {
   const { state, setUsername } = useGame();
@@ -55,7 +53,7 @@ export default function SettingsPage() {
             onChange={(e) => setName(e.target.value)}
             maxLength={24}
             aria-label="Hero name"
-            className={inputCls}
+            className={`${fieldCls} min-w-0 flex-1`}
           />
           <Button type="submit" variant="ghost" disabled={saving}>
             {saving ? "Saving…" : "Save"}

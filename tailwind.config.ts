@@ -15,16 +15,7 @@ const config: Config = {
           800: "#141922",
           700: "#1b222e",
         },
-        obsidian: {
-          900: "#10141c",
-          800: "#161c27",
-          700: "#1e2634",
-          600: "#2a3446",
-        },
-        ink: {
-          DEFAULT: "#ece7da",
-          dim: "#c9c3b4",
-        },
+        ink: "#ece7da",
         fog: {
           DEFAULT: "#99a1ad",
           faint: "#5f6773",
@@ -50,12 +41,7 @@ const config: Config = {
         body: ["Outfit", "Inter", "system-ui", "sans-serif"],
       },
       borderRadius: {
-        rune: "8px",
         sharp: "3px",
-      },
-      boxShadow: {
-        card: "0 12px 32px rgba(0, 0, 0, 0.4)",
-        lift: "0 4px 14px rgba(0, 0, 0, 0.35)",
       },
     },
   },

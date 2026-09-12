@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/primitives";
 import { loginSchema } from "@/lib/validation/schemas";
-
-const inputCls =
-  "w-full rounded-sharp border hairline bg-black/40 px-3.5 py-2.5 text-[15px] text-ink outline-none placeholder:text-fog-faint focus:border-gold-500/60";
+import { fieldCls } from "@/components/ui/field";
 
 function LoginForm() {
   const router = useRouter();
@@ -56,14 +54,14 @@ function LoginForm() {
         <span className="kicker mb-2 block !text-[10px] text-fog-faint">Email</span>
         <input
           type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email" className={inputCls}
+          autoComplete="email" className={fieldCls}
         />
       </label>
       <label className="mt-4 block">
         <span className="kicker mb-2 block !text-[10px] text-fog-faint">Password</span>
         <input
           type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password" className={inputCls}
+          autoComplete="current-password" className={fieldCls}
         />
       </label>
       {error && <p role="alert" className="mt-4 text-sm text-blood">{error}</p>}

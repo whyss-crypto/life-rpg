@@ -51,12 +51,12 @@ npm run build
 ## Architecture
 - `lib/game/*` — pure RPG math (tested). `app/actions/*` — Server Actions calling `complete_quest` / `purchase_item` RPCs.
 - Client never decides XP/Gold/Level; it animates only after the server confirms (optimistic presentation rolls back on reject).
-- Without env vars the app runs in labeled **Demo mode** (local mirror using the same formulas) so the build/preview never crashes.
+- Supabase is the source of truth — set the env vars in `.env.local` (see setup above) or the app cannot save.
 
 ## Demo video script (90–180s)
 Landing (10s) → signup (15s) → dashboard/HUD (20s) → create quest (15s) → complete + flyout (20s) →
 level-up (15s) → shop/vault (20s) → refresh → persistence (15s).
 
 ## Known limitations
-- Demo store is per-device until Supabase is connected (by design, clearly labeled).
+- No OAuth yet (email/password only); no realtime multiplayer.
 - No OAuth yet (email/password only); no realtime multiplayer.

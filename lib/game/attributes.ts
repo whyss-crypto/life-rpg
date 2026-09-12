@@ -31,6 +31,6 @@ export function attributeForCategory(category: string): AttributeKey {
   return found ? found.attribute : "focus";
 }
 
-export function isAttributeKey(v: string): v is AttributeKey {
-  return (["strength", "intellect", "endurance", "wisdom", "focus"] as string[]).includes(v);
+export function attributeLabel(key: string): string {
+  return ATTRIBUTES.find((a) => a.key === key)?.label ?? key;
 }

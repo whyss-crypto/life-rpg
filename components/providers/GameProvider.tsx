@@ -13,7 +13,6 @@ import { purchaseItemAction } from "@/app/actions/shop";
 
 // Re-exported so quest/shop components keep stable prop types.
 export type DemoQuest = BoardQuest;
-export type DemoCharacter = BoardCharacter;
 export type DemoItem = BoardItem;
 
 export type CompleteRes = Awaited<ReturnType<typeof completeQuestAction>>;

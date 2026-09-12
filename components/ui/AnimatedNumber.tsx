@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export function useAnimatedCounter(target: number, duration = 900): number {
+function useAnimatedCounter(target: number, duration = 900): number {
   const [value, setValue] = useState(target);
   const fromRef = useRef(target);
   const rafRef = useRef<number>(0);

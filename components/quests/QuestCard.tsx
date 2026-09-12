@@ -4,15 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import type { DemoQuest } from "@/components/providers/GameProvider";
+import { attributeLabel } from "@/lib/game/attributes";
 import { cn } from "@/lib/utils";
-
-const ATTR_LABEL: Record<string, string> = {
-  strength: "Strength",
-  intellect: "Intellect",
-  endurance: "Endurance",
-  wisdom: "Wisdom",
-  focus: "Focus",
-};
 
 export function QuestCard({
   quest,
@@ -65,7 +58,7 @@ export function QuestCard({
           </p>
         )}
         <p className="kicker mt-2.5 !text-[10px] !tracking-[0.22em] text-fog-faint">
-          {ATTR_LABEL[quest.attribute_reward] ?? quest.attribute_reward} · {quest.difficulty}
+          {attributeLabel(quest.attribute_reward)} · {quest.difficulty}
           {done && quest.attribute_points > 0 && (
             <span className="ml-2 text-steel-300">+{quest.attribute_points}</span>
           )}

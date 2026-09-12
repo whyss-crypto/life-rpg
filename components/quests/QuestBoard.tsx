@@ -10,18 +10,11 @@ import { flyToken, hudTarget, pulseHud, prefersReducedMotion } from "@/component
 import { Button } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/ui/primitives";
 import { cn } from "@/lib/utils";
+import { attributeLabel } from "@/lib/game/attributes";
 
 const FILTERS = ["all", "active", "completed", "strength", "intellect", "endurance", "wisdom", "focus"] as const;
 
-const ATTR_LABEL: Record<string, string> = {
-  strength: "Strength",
-  intellect: "Intellect",
-  endurance: "Endurance",
-  wisdom: "Wisdom",
-  focus: "Focus",
-};
-
-export function QuestBoard({ onStats }: { onStats?: (s: { levelUp: { old: number; next: number } | null }) => void }) {
+export function QuestBoard() {
   const { state, createQuest, removeQuest, completeQuest } = useGame();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [modal, setModal] = useState(false);
@@ -78,13 +71,12 @@ export function QuestBoard({ onStats }: { onStats?: (s: { levelUp: { old: number
       setLevelUp({
         old: res.oldLevel,
         next: res.newLevel,
-        detail: `+${res.attributePoints} ${ATTR_LABEL[res.attribute] ?? res.attribute}`,
+        detail: `+${res.attributePoints} ${attributeLabel(res.attribute)}`,
       });
     }
     if (res.achievements.length > 0) {
       setNotice(`Feat unlocked — ${res.achievements.join(", ")}`);
     }
-    onStats?.({ levelUp: res.levelUp ? { old: res.oldLevel, next: res.newLevel } : null });
   }
 
   return (

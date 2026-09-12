@@ -11,7 +11,3 @@ export function rewardsFor(difficulty: string): { xp: number; gold: number; attr
   const d = difficulty.toLowerCase() as Difficulty;
   return REWARDS[d] ?? REWARDS.normal;
 }
-
-export function isDifficulty(v: string): v is Difficulty {
-  return ["easy", "normal", "hard", "epic"].includes(v.toLowerCase());
-}

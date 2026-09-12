@@ -5,7 +5,7 @@ import { createServerSupabase, isServerSupabaseConfigured } from "@/lib/supabase
 
 export async function purchaseItemAction(itemId: string) {
   if (!isServerSupabaseConfigured()) {
-    return { ok: false as const, error: "Demo mode: purchase handled locally." };
+    return { ok: false as const, error: "Backend not connected." };
   }
   const supabase = await createServerSupabase();
   const { data: userData } = await supabase.auth.getUser();

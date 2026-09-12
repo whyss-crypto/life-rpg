@@ -19,7 +19,7 @@ export async function createQuestAction(form: {
   dueAt?: string | null;
 }) {
   if (!isServerSupabaseConfigured()) {
-    return err("Demo mode: Supabase not connected. Quest will be kept locally by the demo store.");
+    return err("Backend not connected. Set Supabase keys and restart the dev server.");
   }
   const parsed = questSchema.safeParse({
     title: form.title,
@@ -60,7 +60,7 @@ export async function createQuestAction(form: {
 }
 
 export async function deleteQuestAction(questId: string) {
-  if (!isServerSupabaseConfigured()) return err("Demo mode.");
+  if (!isServerSupabaseConfigured()) return err("Backend not connected.");
   const supabase = await createServerSupabase();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return err("Session expired.");
@@ -73,7 +73,7 @@ export async function deleteQuestAction(questId: string) {
 
 export async function completeQuestAction(questId: string) {
   if (!isServerSupabaseConfigured()) {
-    return err("Demo mode: completion handled locally.");
+    return err("Backend not connected.");
   }
   const supabase = await createServerSupabase();
   const { data: userData } = await supabase.auth.getUser();

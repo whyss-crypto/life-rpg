@@ -6,9 +6,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/primitives";
 import { CATEGORIES } from "@/lib/game/attributes";
 import { rewardsFor } from "@/lib/game/economy";
-
-const inputCls =
-  "w-full rounded-sharp border hairline bg-black/40 px-3.5 py-2.5 text-[15px] text-ink outline-none placeholder:text-fog-faint focus:border-gold-500/60";
+import { fieldCls } from "@/components/ui/field";
 
 export function CreateQuestModal({
   open,
@@ -78,7 +76,7 @@ export function CreateQuestModal({
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Study React for 1 hour"
                 maxLength={120}
-                className={inputCls}
+                className={fieldCls}
                 autoFocus
               />
             </label>
@@ -91,14 +89,14 @@ export function CreateQuestModal({
                 placeholder="What does finished look like?"
                 rows={2}
                 maxLength={500}
-                className={inputCls}
+                className={fieldCls}
               />
             </label>
 
             <div className="mt-4 grid grid-cols-2 gap-4">
               <label className="block">
                 <span className="kicker mb-2 block !text-[10px] text-fog-faint">Discipline</span>
-                <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className={fieldCls}>
                   {CATEGORIES.map((c) => (
                     <option key={c.key} value={c.key}>
                       {c.label}
@@ -108,7 +106,7 @@ export function CreateQuestModal({
               </label>
               <label className="block">
                 <span className="kicker mb-2 block !text-[10px] text-fog-faint">Weight</span>
-                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as typeof difficulty)} className={inputCls}>
+                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as typeof difficulty)} className={fieldCls}>
                   <option value="easy">Easy</option>
                   <option value="normal">Normal</option>
                   <option value="hard">Hard</option>

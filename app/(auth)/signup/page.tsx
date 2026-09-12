@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/primitives";
 import { signupSchema } from "@/lib/validation/schemas";
-
-const inputCls =
-  "w-full rounded-sharp border hairline bg-black/40 px-3.5 py-2.5 text-[15px] text-ink outline-none placeholder:text-fog-faint focus:border-gold-500/60";
+import { fieldCls } from "@/components/ui/field";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -77,21 +75,21 @@ export default function SignupPage() {
           <input
             value={username} onChange={(e) => setUsername(e.target.value)} required
             placeholder="dragon_slayer_01" maxLength={24} autoComplete="username"
-            className={inputCls}
+            className={fieldCls}
           />
         </label>
         <label className="mt-4 block">
           <span className="kicker mb-2 block !text-[10px] text-fog-faint">Email</span>
           <input
             type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email" className={inputCls}
+            autoComplete="email" className={fieldCls}
           />
         </label>
         <label className="mt-4 block">
           <span className="kicker mb-2 block !text-[10px] text-fog-faint">Password · min 6</span>
           <input
             type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password" className={inputCls}
+            autoComplete="new-password" className={fieldCls}
           />
         </label>
         {error && <p role="alert" className="mt-4 text-sm text-blood">{error}</p>}
