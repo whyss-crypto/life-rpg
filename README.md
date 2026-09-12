@@ -53,9 +53,6 @@ npm run build
 - Client never decides XP/Gold/Level; it animates only after the server confirms (optimistic presentation rolls back on reject).
 - Supabase is the source of truth — set the env vars in `.env.local` (see setup above) or the app cannot save.
 
-## Demo video script (90–180s)
-Landing (10s) → signup (15s) → dashboard/HUD (20s) → create quest (15s) → complete + flyout (20s) →
-level-up (15s) → shop/vault (20s) → refresh → persistence (15s).
 
 ## Known limitations
 - No OAuth yet (email/password only); no realtime multiplayer.
