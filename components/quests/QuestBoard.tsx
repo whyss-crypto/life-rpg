@@ -14,12 +14,13 @@ import { cn } from "@/lib/utils";
 const FILTERS = ["all", "active", "completed", "strength", "intellect", "endurance", "wisdom", "focus"] as const;
 
 export function QuestBoard({ onStats }: { onStats?: (s: { levelUp: { old: number; next: number } | null }) => void }) {
-  const { state, createQuest, deleteQuest, completeQuest } = useGame();
+  const { state, createQuest, removeQuest, completeQuest } = useGame();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [modal, setModal] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [levelUp, setLevelUp] = useState<{ old: number; next: number } | null>(null);
   const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
   const flyouts = useFlyouts();
 
   const quests = useMemo(() => {
@@ -32,46 +33,28 @@ export function QuestBoard({ onStats }: { onStats?: (s: { levelUp: { old: number
   }, [state.quests, filter]);
 
   async function handleCreate(q: { title: string; description: string; category: string; difficulty: "easy" | "normal" | "hard" | "epic" }) {
-    // Authoritative server first (no-op in demo mode), local store mirrors instantly.
-    try {
-      const { createQuestAction } = await import("@/app/actions/quests");
-      await createQuestAction({ ...q, dueAt: null });
-    } catch {}
-    createQuest(q);
+    setError("");
+    const r = await createQuest(q);
+    if (!r.ok) setError(r.error ?? "Could not create quest. Try again.");
+  }
+
+  async function handleDelete(id: string) {
+    setError("");
+    const r = await removeQuest(id);
+    if (!r.ok) setError(r.error ?? "Could not abandon quest.");
   }
 
   async function handleComplete(id: string) {
     if (pendingId) return;
     setPendingId(id);
     setNotice("");
-    // tiny tactile delay so the button press is felt (optimistic presentation only)
+    setError("");
+    // Tiny tactile delay so the button press is felt; the server verdict follows.
     await new Promise((r) => setTimeout(r, 120));
-    try {
-      const { completeQuestAction } = await import("@/app/actions/quests");
-      const server = await completeQuestAction(id);
-      if (!server.ok && server.error && !server.error.startsWith("Demo mode")) {
-        // Server is authoritative when connected: surface its verdict.
-        if (server.error.includes("already completed")) {
-          setPendingId(null);
-          setNotice("Quest already completed — no double rewards.");
-          return;
-        }
-      }
-      if (server.ok) {
-        flyouts.push(server.xpGained, server.goldGained);
-        if (server.levelUp) setLevelUp({ old: server.oldLevel, next: server.newLevel });
-        if (server.achievements.length > 0) setNotice(`Achievement unlocked: ${server.achievements.join(", ")}`);
-        // Mirror into local store so demo + server stay visually in sync.
-        completeQuest(id);
-        setPendingId(null);
-        onStats?.({ levelUp: server.levelUp ? { old: server.oldLevel, next: server.newLevel } : null });
-        return;
-      }
-    } catch {}
-    const res = completeQuest(id);
+    const res = await completeQuest(id);
     setPendingId(null);
-    if (!res) {
-      setNotice("Quest already completed — no double rewards.");
+    if (!res.ok) {
+      setError(res.error);
       return;
     }
     flyouts.push(res.xpGained, res.goldGained);
@@ -120,6 +103,11 @@ export function QuestBoard({ onStats }: { onStats?: (s: { levelUp: { old: number
           {notice}
         </p>
       )}
+      {error && (
+        <p role="alert" className="mb-3 rounded-rune border border-blood/40 bg-blood/10 px-3 py-2 text-sm text-blood">
+          {error}
+        </p>
+      )}
 
       {quests.length === 0 ? (
         <EmptyState
@@ -139,7 +127,7 @@ export function QuestBoard({ onStats }: { onStats?: (s: { levelUp: { old: number
               quest={q}
               pending={pendingId === q.id}
               onComplete={() => void handleComplete(q.id)}
-              onDelete={() => deleteQuest(q.id)}
+              onDelete={() => void handleDelete(q.id)}
             />
           ))}
         </div>

@@ -3,9 +3,6 @@ import { Swords, Flame, Coins, Trophy, ChevronRight, Sparkles } from "lucide-rea
 import { GlowCard } from "@/components/ui/GlowCard";
 
 export default function LandingPage() {
-  const configured = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-  );
   return (
     <div className="min-h-screen">
       {/* top bar */}
@@ -55,15 +52,9 @@ export default function LandingPage() {
                 href="/dashboard"
                 className="inline-flex min-h-[48px] items-center rounded-rune border border-white/15 bg-white/5 px-6 hover:bg-white/10"
               >
-                View Demo Board
+                Open Dashboard
               </Link>
             </div>
-            {!configured && (
-              <p className="mt-4 rounded-rune border border-arcane-400/30 bg-arcane-500/10 px-3 py-2 text-sm text-arcane-300">
-                Demo mode is active — connect Supabase in <code>.env.local</code> to enable persistent
-                multiplayer-grade saves. See README for the 2-minute setup.
-              </p>
-            )}
           </div>
 
           {/* interactive preview card */}

@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { Coins } from "lucide-react";
-import { useGame, DEMO_SHOP } from "@/components/providers/GameProvider";
+import { useGame } from "@/components/providers/GameProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { HUDHeader } from "@/components/layout/HUDHeader";
 import { ShopItemCard } from "@/components/shop/ShopItemCard";
+import { EmptyState } from "@/components/ui/primitives";
 
 export default function ShopPage() {
   const { state, purchase } = useGame();
@@ -36,33 +37,29 @@ export default function ShopPage() {
         </p>
       )}
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {DEMO_SHOP.map((item) => (
-          <ShopItemCard
-            key={item.id}
-            item={item}
-            owned={state.inventory.includes(item.id)}
-            onBuy={async () => {
-              // Try authoritative server purchase first; fall back to demo store.
-              try {
-                const { purchaseItemAction } = await import("@/app/actions/shop");
-                const res = await purchaseItemAction(item.id);
-                if (res.ok) {
-                  setNotice(`${item.name} acquired!`);
-                  purchase(item.id);
-                  return { ok: true as const };
-                }
-                if (res.error && !res.error.startsWith("Demo mode")) {
-                  return { ok: false as const, error: res.error };
-                }
-              } catch {}
-              const local = purchase(item.id);
-              if (local.ok) setNotice(`${item.name} acquired! Check your Vault.`);
-              return local;
-            }}
+      {state.catalog.length === 0 ? (
+        <div className="mt-4">
+          <EmptyState
+            title="THE ARMORY IS EMPTY."
+            body="No relics are stocked yet. Run the database seed migration (004_seed_data.sql) to fill the shelves."
           />
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {state.catalog.map((item) => (
+            <ShopItemCard
+              key={item.id}
+              item={item}
+              owned={state.inventory.includes(item.id)}
+              onBuy={async () => {
+                const r = await purchase(item.id);
+                if (r.ok) setNotice(`${item.name} acquired! Check your Vault.`);
+                return r;
+              }}
+            />
+          ))}
+        </div>
+      )}
     </AppShell>
   );
 }

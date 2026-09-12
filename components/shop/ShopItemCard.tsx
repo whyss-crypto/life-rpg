@@ -11,7 +11,7 @@ export interface ShopItem {
   type: string;
   rarity: string;
   price: number;
-  description: string;
+  description: string | null;
 }
 
 const RARITY_STYLE: Record<string, string> = {
@@ -54,7 +54,7 @@ export function ShopItemCard({
         <span className="text-[11px] uppercase tracking-widest text-slate-500">{item.type}</span>
       </div>
       <h3 className="font-display mt-2 text-lg font-bold">{item.name}</h3>
-      <p className="mt-1 min-h-[40px] text-sm text-slate-400">{item.description}</p>
+      <p className="mt-1 min-h-[40px] text-sm text-slate-400">{item.description ?? "A mysterious relic of the realm."}</p>
       <div className="mt-3 flex items-center justify-between">
         <span className="flex items-center gap-1.5 font-semibold text-gold-300">
           <Coins className="h-4 w-4" aria-hidden="true" /> {item.price} G

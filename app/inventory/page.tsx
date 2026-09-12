@@ -1,6 +1,6 @@
 "use client";
 
-import { useGame, DEMO_SHOP } from "@/components/providers/GameProvider";
+import { useGame } from "@/components/providers/GameProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { HUDHeader } from "@/components/layout/HUDHeader";
 import { InventoryVault } from "@/components/inventory/InventoryVault";
@@ -20,7 +20,7 @@ export default function InventoryPage() {
       <div className="mt-4">
         <InventoryVault
           owned={state.inventory}
-          catalog={DEMO_SHOP}
+          catalog={state.catalog}
           equippedTitle={c.equipped_title}
           onEquip={equipTitle}
         />
