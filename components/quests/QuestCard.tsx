@@ -63,22 +63,20 @@ export function QuestCard({
             <span className="ml-2 text-steel-300">+{quest.attribute_points}</span>
           )}
         </p>
-        {!done && (
-          <button
-            onClick={() => {
-              if (confirming) {
-                onDelete();
-              } else {
-                setConfirming(true);
-                window.setTimeout(() => setConfirming(false), 2600);
-              }
-            }}
-            className="mt-2 text-xs text-fog-faint opacity-0 transition hover:text-blood focus-visible:opacity-100 group-hover:opacity-100"
-            aria-label={confirming ? `Confirm abandoning ${quest.title}` : `Abandon ${quest.title}`}
-          >
-            {confirming ? "Confirm abandon?" : "Abandon"}
-          </button>
-        )}
+        <button
+          onClick={() => {
+            if (confirming) {
+              onDelete();
+            } else {
+              setConfirming(true);
+              window.setTimeout(() => setConfirming(false), 2600);
+            }
+          }}
+          className="mt-2 text-xs text-fog-faint transition hover:text-blood"
+          aria-label={confirming ? `Confirm deleting ${quest.title}` : `Delete ${quest.title}`}
+        >
+          {confirming ? "Confirm delete?" : "Delete"}
+        </button>
       </div>
 
       <div className="col-span-2 flex items-center justify-between gap-4 pl-11 sm:col-span-1 sm:flex-col sm:items-end sm:justify-center sm:pl-0">
