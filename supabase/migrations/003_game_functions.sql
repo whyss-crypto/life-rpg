@@ -114,9 +114,8 @@ begin
   if v_total_quests >= 1 then
     insert into public.user_achievements (user_id, achievement_id)
     select v_user, id from public.achievements where name = 'FIRST QUEST'
-    on conflict do nothing
-    returning (select name from public.achievements where id = achievement_id) into v_ach[array_length(v_ach,1)+1];
-    -- simpler: recompute unlocked list below
+    on conflict do nothing;
+    -- full unlocked list is recomputed below
   end if;
   if v_new_streak >= 7 then
     insert into public.user_achievements (user_id, achievement_id)
