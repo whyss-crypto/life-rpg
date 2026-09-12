@@ -20,7 +20,12 @@ export default function DashboardPage() {
         <div>
           <p className="font-display text-xs tracking-[0.3em] text-gold-300">ADVENTURER&apos;S HUB</p>
           <h1 className="font-display text-2xl font-bold sm:text-3xl">
-            Dashboard <span className="text-sm font-normal text-slate-400">· {active} active quests</span>
+            {state.username ? (
+              <>Welcome back, <span className="gold-text">{state.username}</span></>
+            ) : (
+              "Dashboard"
+            )}{" "}
+            <span className="text-sm font-normal text-slate-400">· {active} active quests</span>
           </h1>
         </div>
         <Link href="/character" className="hidden rounded-rune border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10 sm:block">

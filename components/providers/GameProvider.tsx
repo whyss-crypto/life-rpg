@@ -57,6 +57,7 @@ export const DEMO_SHOP: DemoItem[] = [
 const KEY = "life-rpg-demo-v1";
 
 interface DemoState {
+  username: string;
   character: DemoCharacter;
   quests: DemoQuest[];
   inventory: string[];
@@ -65,6 +66,7 @@ interface DemoState {
 }
 
 const DEFAULT_STATE: DemoState = {
+  username: "",
   character: {
     level: 1, xp: 0, gold: 120,
     strength: 2, intellect: 3, endurance: 2, wisdom: 2, focus: 2,
@@ -100,9 +102,17 @@ function load(): DemoState {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return DEFAULT_STATE;
-    const parsed = JSON.parse(raw) as DemoState;
+    const parsed = JSON.parse(raw) as Partial<DemoState>;
     if (!parsed.character || !Array.isArray(parsed.quests)) return DEFAULT_STATE;
-    return parsed;
+    // Merge over defaults so old saves without newer fields (e.g. username) still load.
+    return {
+      ...DEFAULT_STATE,
+      ...parsed,
+      character: { ...DEFAULT_STATE.character, ...parsed.character },
+      quests: parsed.quests,
+      inventory: Array.isArray(parsed.inventory) ? parsed.inventory : [],
+      achievements: Array.isArray(parsed.achievements) ? parsed.achievements : [],
+    };
   } catch {
     return DEFAULT_STATE;
   }
@@ -124,6 +134,7 @@ export interface CompleteResult {
 interface GameCtx {
   mode: "demo" | "supabase";
   state: DemoState;
+  setUsername: (name: string) => void;
   createQuest: (q: { title: string; description: string; category: string; difficulty: DemoQuest["difficulty"] }) => void;
   deleteQuest: (id: string) => void;
   completeQuest: (id: string) => CompleteResult | null;
@@ -265,10 +276,14 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const resetDemo = useCallback(() => {
-    setState(DEFAULT_STATE);
+    setState((s) => ({ ...DEFAULT_STATE, username: s.username }));
     try {
       localStorage.removeItem(KEY);
     } catch {}
+  }, []);
+
+  const setUsername = useCallback((name: string) => {
+    setState((s) => ({ ...s, username: name.slice(0, 24) }));
   }, []);
 
   const mode: GameCtx["mode"] =
@@ -278,8 +293,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       : "demo"; // server-connected mode upgrades these flows to Server Actions; demo store always available offline
 
   const value = useMemo(
-    () => ({ mode, state, createQuest, deleteQuest, completeQuest, purchase, equipTitle, resetDemo }),
-    [mode, state, createQuest, deleteQuest, completeQuest, purchase, equipTitle, resetDemo]
+    () => ({ mode, state, setUsername, createQuest, deleteQuest, completeQuest, purchase, equipTitle, resetDemo }),
+    [mode, state, setUsername, createQuest, deleteQuest, completeQuest, purchase, equipTitle, resetDemo]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

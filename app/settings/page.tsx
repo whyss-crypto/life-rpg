@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/primitives";
 import { GlowCard } from "@/components/ui/GlowCard";
 
 export default function SettingsPage() {
-  const { resetDemo } = useGame();
+  const { state, setUsername, resetDemo } = useGame();
   const router = useRouter();
   const [msg, setMsg] = useState("");
+  const [name, setName] = useState(state.username);
   const supabaseReady = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   );
@@ -36,6 +37,33 @@ export default function SettingsPage() {
               ? "Supabase is configured. Auth + authoritative saves are live."
               : "Demo mode — add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to .env.local, run the SQL in supabase/migrations, and restart. See README."}
           </p>
+        </GlowCard>
+        <GlowCard className="p-4">
+          <h2 className="font-semibold">Hero name</h2>
+          <p className="mt-1 text-sm text-slate-400">Shown across your dashboard and character sheet.</p>
+          <form
+            className="mt-3 flex gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!/^[a-zA-Z0-9_]{3,24}$/.test(name)) {
+                setMsg("Name: 3–24 chars, letters/numbers/_ only.");
+                return;
+              }
+              setUsername(name);
+              setMsg("Hero name updated.");
+            }}
+          >
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={24}
+              aria-label="Hero name"
+              className="min-w-0 flex-1 rounded-rune border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-gold-400/60"
+            />
+            <Button type="submit" variant="ghost" className="!min-h-[40px]">
+              Save
+            </Button>
+          </form>
         </GlowCard>
         <GlowCard className="p-4">
           <h2 className="font-semibold">Demo data</h2>

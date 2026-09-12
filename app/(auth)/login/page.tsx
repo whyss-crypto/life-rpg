@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/primitives";
 
+const DEMO_MODE =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -16,6 +19,11 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setPending(true);
+    if (DEMO_MODE) {
+      // No backend connected: enter the local demo realm directly.
+      router.push("/dashboard");
+      return;
+    }
     try {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
@@ -41,6 +49,11 @@ export default function LoginPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4">
       <p className="font-display text-center text-sm tracking-[0.3em] text-gold-300">WELCOME BACK, HERO</p>
       <h1 className="font-display mt-2 text-center text-3xl font-bold">Sign in</h1>
+      {DEMO_MODE && (
+        <p role="note" className="mt-4 rounded-rune border border-gold-400/30 bg-gold-500/10 px-3 py-2 text-center text-sm text-gold-300">
+          Demo mode — any credentials will enter your local realm.
+        </p>
+      )}
       <form onSubmit={submit} className="card-surface mt-6 rounded-rune p-6">
         <label className="mb-3 block">
           <span className="mb-1 block text-sm">Email</span>
