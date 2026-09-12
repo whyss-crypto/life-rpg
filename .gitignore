@@ -19,3 +19,9 @@ yarn-error.log*
 
 .playwright-mcp
 tsconfig.tsbuildinfo
+
+# local-only spec docs (kept on disk, never pushed)
+Life_RPG_PRD_OpenCode.md
+Life_RPG_Web_App_PRD.md
+implementation_plan.md
+IMPLEMENTATION_STATUS.md
