@@ -41,8 +41,14 @@ function LoginForm() {
       }
       router.push("/dashboard");
       router.refresh();
-    } catch {
-      setError("Sign-in failed. Check your connection and try again.");
+    } catch (err) {
+      const blocked =
+        err instanceof TypeError && /fetch|network|failed/i.test(err.message);
+      setError(
+        blocked
+          ? "Could not reach the auth server. Turn off ad-blockers/VPN for this site and try again."
+          : "Sign-in failed. Check your connection and try again."
+      );
     } finally {
       setPending(false);
     }

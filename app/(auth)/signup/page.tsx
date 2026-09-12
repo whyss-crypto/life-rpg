@@ -58,8 +58,16 @@ export default function SignupPage() {
       }
       router.push("/dashboard");
       router.refresh();
-    } catch {
-      setError("Signup failed. Check your connection and try again.");
+    } catch (err) {
+      // No response was received at all (blocked request, VPN, offline) —
+      // safe to say so: nothing about the account is revealed.
+      const blocked =
+        err instanceof TypeError && /fetch|network|failed/i.test(err.message);
+      setError(
+        blocked
+          ? "Could not reach the auth server. Turn off ad-blockers/VPN for this site and try again."
+          : "Signup failed. Check your connection and try again."
+      );
     } finally {
       setPending(false);
     }
