@@ -47,7 +47,7 @@ export default function SettingsPage() {
       <section className="mt-8 border-t hairline pt-6" aria-label="Hero name">
         <h2 className="text-lg font-semibold text-ink">Hero name</h2>
         <p className="mt-1 text-[15px] text-fog">Written beside your level, everywhere.</p>
-        <form className="mt-4 flex max-w-md gap-3" onSubmit={(e) => void saveName(e)}>
+          <form className="mt-4 flex max-w-md flex-col gap-3 sm:flex-row" onSubmit={(e) => void saveName(e)}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}

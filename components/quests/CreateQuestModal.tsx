@@ -93,7 +93,7 @@ export function CreateQuestModal({
               />
             </label>
 
-            <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 gap-4 min-[420px]:grid-cols-2">
               <label className="block">
                 <span className="kicker mb-2 block !text-[10px] text-fog-faint">Discipline</span>
                 <select value={category} onChange={(e) => setCategory(e.target.value)} className={fieldCls}>

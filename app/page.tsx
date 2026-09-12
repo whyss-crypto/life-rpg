@@ -62,26 +62,34 @@ function LoopIndex() {
 function CurveScale() {
   // Cumulative XP gates at a few levels — the honest shape of progression.
   const marks = [
-    { l: 1, xp: 0 },
-    { l: 5, xp: 1447 },
-    { l: 10, xp: 6698 },
-    { l: 15, xp: 17055 },
-    { l: 20, xp: 33144 },
+    { l: 1, xp: 0, mobile: true },
+    { l: 5, xp: 1447, mobile: false },
+    { l: 10, xp: 6698, mobile: true },
+    { l: 15, xp: 17055, mobile: false },
+    { l: 20, xp: 33144, mobile: true },
   ];
   const max = marks[marks.length - 1].xp;
   return (
     <div className="mt-10" aria-label="Experience required by level">
       <div className="relative h-px bg-white/12" aria-hidden="true">
         {marks.map((m) => (
-          <div key={m.l} className="absolute top-0" style={{ left: `${(m.xp / max) * 100}%` }}>
+          <div
+            key={m.l}
+            className={`absolute top-0 ${m.mobile ? "" : "hidden sm:block"}`}
+            style={{ left: `${(m.xp / max) * 100}%` }}
+          >
             <div className="h-2.5 w-px -translate-y-1 bg-gold-500" />
           </div>
         ))}
       </div>
       <div className="relative mt-3 h-16" aria-hidden="true">
         {marks.map((m) => (
-          <div key={m.l} className="absolute" style={{ left: `${(m.xp / max) * 100}%` }}>
-            <p className="display-num -translate-x-1/2 text-sm text-ink">Lv {m.l}</p>
+          <div
+            key={m.l}
+            className={`absolute ${m.mobile ? "" : "hidden sm:block"}`}
+            style={{ left: `${(m.xp / max) * 100}%` }}
+          >
+            <p className="display-num -translate-x-1/2 whitespace-nowrap text-sm text-ink">Lv {m.l}</p>
             <p className="tnum -translate-x-1/2 whitespace-nowrap text-xs text-fog-faint">
               {m.xp.toLocaleString()} XP
             </p>

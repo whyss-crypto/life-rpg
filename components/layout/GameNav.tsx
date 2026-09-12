@@ -90,16 +90,18 @@ export function GameNav() {
         className="fixed inset-x-0 bottom-0 z-50 border-t hairline bg-void-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
         aria-label="Primary mobile"
       >
-        <div className="grid grid-cols-5 px-1 py-1.5">
-          {LINKS.slice(0, 5).map(({ href, label, icon: Icon }) => {
+        <div className="grid grid-cols-6 px-1 py-1.5">
+          {LINKS.slice(0, 6).map(({ href, label, icon: Icon }, i) => {
             const active = path === href;
+            const short = ["Home", "Quests", "Hero", "Shop", "Vault", "Feats"][i] ?? label;
             return (
               <Link
                 key={href}
                 href={href}
                 aria-current={active ? "page" : undefined}
+                aria-label={label}
                 className={cn(
-                  "relative flex min-h-[54px] flex-col items-center justify-center gap-1 text-[11px]",
+                  "relative flex min-h-[54px] min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[10px]",
                   active ? "text-ink" : "text-fog-faint"
                 )}
               >
@@ -107,7 +109,7 @@ export function GameNav() {
                   <span className="absolute top-0 h-[2px] w-8 bg-gold-500" aria-hidden="true" />
                 )}
                 <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
-                {label}
+                <span className="truncate">{short}</span>
               </Link>
             );
           })}
