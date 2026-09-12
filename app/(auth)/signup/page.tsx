@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/primitives";
+import { signupSchema } from "@/lib/validation/schemas";
 
 const inputCls =
   "w-full rounded-sharp border hairline bg-black/40 px-3.5 py-2.5 text-[15px] text-ink outline-none placeholder:text-fog-faint focus:border-gold-500/60";
@@ -21,25 +22,35 @@ export default function SignupPage() {
     e.preventDefault();
     setError("");
     setInfo("");
-    if (!/^[a-zA-Z0-9_]{3,24}$/.test(username)) {
-      setError("Username: 3–24 chars, letters/numbers/_ only.");
+    const parsed = signupSchema.safeParse({ email, password, username });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Check your details and try again.");
       return;
     }
     setPending(true);
     try {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
-      const { data, error: err } = await supabase.auth.signUp({ email, password });
+      const { data, error: err } = await supabase.auth.signUp({
+        email: parsed.data.email,
+        password: parsed.data.password,
+      });
       if (err) {
-        setError(err.message);
+        // Mask only the existing-account case (user enumeration); surface
+        // actionable errors such as weak passwords or throttling.
+        if (/already|registered|exists|taken|duplicate/i.test(err.message)) {
+          setError("Could not create that account. If the email is new, check your inbox to confirm it.");
+        } else {
+          setError(err.message);
+        }
         return;
       }
       const user = data.user;
       if (user) {
         await supabase.from("profiles").insert({
           id: user.id,
-          username,
-          display_name: username,
+          username: parsed.data.username,
+          display_name: parsed.data.username,
         });
         await supabase.from("characters").insert({ user_id: user.id });
       }
@@ -49,8 +60,8 @@ export default function SignupPage() {
       }
       router.push("/dashboard");
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Signup failed. Check your connection and try again.");
+    } catch {
+      setError("Signup failed. Check your connection and try again.");
     } finally {
       setPending(false);
     }

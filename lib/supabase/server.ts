@@ -3,14 +3,17 @@ import { createServerClient } from "@supabase/ssr";
 
 type CookieToSet = { name: string; value: string; options?: any };
 
-export function createServerSupabase(): any {
+export async function createServerSupabase(): Promise<any> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) {
     throw new Error("Supabase env missing on server.");
   }
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   return createServerClient(url, key, {
+    // Secure in production so session cookies never travel over plain HTTP.
+    // Plain HTTP stays working for localhost/LAN/mobile dev servers.
+    cookieOptions: { secure: process.env.NODE_ENV === "production" },
     cookies: {
       getAll() {
         return cookieStore.getAll();

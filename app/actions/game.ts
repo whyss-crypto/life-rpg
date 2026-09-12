@@ -84,7 +84,7 @@ export async function getGameState(): Promise<{ ok: true; board: BoardState } | 
       error: "Supabase keys are missing. Add them to .env.local and restart the dev server.",
     };
   }
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: userData, error: authErr } = await supabase.auth.getUser();
   const user = userData?.user ?? null;
   if (authErr || !user) {
@@ -258,7 +258,7 @@ export async function updateUsernameAction(
   if (!isServerSupabaseConfigured()) {
     return { ok: false as const, error: "Backend not connected." };
   }
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: userData } = await supabase.auth.getUser();
   const user = userData?.user;
   if (!user) return { ok: false as const, error: "Session expired. Please sign in again." };
@@ -288,7 +288,7 @@ export async function equipTitleAction(
   if (!isServerSupabaseConfigured()) {
     return { ok: false as const, error: "Backend not connected." };
   }
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: userData } = await supabase.auth.getUser();
   const user = userData?.user;
   if (!user) return { ok: false as const, error: "Session expired. Please sign in again." };
@@ -305,3 +305,4 @@ export async function equipTitleAction(
   revalidatePath("/inventory");
   return { ok: true as const };
 }
+

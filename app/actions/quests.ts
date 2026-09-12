@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createServerSupabase, isServerSupabaseConfigured } from "@/lib/supabase/server";
 import { questSchema } from "@/lib/validation/schemas";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { attributeForCategory } from "@/lib/game/attributes";
 import { rewardsFor } from "@/lib/game/economy";
 
@@ -28,10 +29,15 @@ export async function createQuestAction(form: {
     dueAt: form.dueAt ?? null,
   });
   if (!parsed.success) return err(parsed.error.issues[0]?.message ?? "Invalid quest");
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: userData } = await supabase.auth.getUser();
   const user = userData.user;
   if (!user) return err("Session expired. Please sign in again.");
+
+  // Spam throttle: 20 quests per 10 minutes per hero (per-instance window).
+  if (!checkRateLimit(`quest-create:${user.id}`, 20, 10 * 60 * 1000).ok) {
+    return err("Easy, hero — too many quests at once. Wait a minute and try again.");
+  }
 
   const r = rewardsFor(parsed.data.difficulty);
   const attr = attributeForCategory(parsed.data.category);
@@ -55,7 +61,7 @@ export async function createQuestAction(form: {
 
 export async function deleteQuestAction(questId: string) {
   if (!isServerSupabaseConfigured()) return err("Demo mode.");
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return err("Session expired.");
   const { error } = await supabase.from("quests").delete().eq("id", questId);
@@ -69,7 +75,7 @@ export async function completeQuestAction(questId: string) {
   if (!isServerSupabaseConfigured()) {
     return err("Demo mode: completion handled locally.");
   }
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return err("Session expired. Please sign in again.");
   const { data, error } = await supabase.rpc("complete_quest", { p_quest_id: questId });
@@ -99,3 +105,4 @@ export async function completeQuestAction(questId: string) {
     achievements: (d["achievements"] as string[]) ?? [],
   };
 }
+
